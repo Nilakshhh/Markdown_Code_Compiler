@@ -1,9 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import rehypeHighlight from 'rehype-highlight';
+import { saveAs } from 'file-saver';
 import 'highlight.js/styles/github.css';
 import './MarkdownEditor.css';
 
@@ -56,14 +56,31 @@ MIT License`;
     });
   };
 
+  const downloadWord = () => {
+    const element = document.querySelector('.preview');
+    if (!element) return;
+
+    const htmlContent = element.innerHTML;
+
+    const html = `
+      <html xmlns:o='urn:schemas-microsoft-com:office:office' 
+            xmlns:w='urn:schemas-microsoft-com:office:word' 
+            xmlns='http://www.w3.org/TR/REC-html40'>
+      <head><title>Exported Document</title></head>
+      <body>${htmlContent}</body>
+      </html>`;
+
+    const blob = new Blob(['\ufeff', html], {
+      type: 'application/msword',
+    });
+
+    saveAs(blob, 'compiled_markdown.doc');
+  };
+
   return (
     <div className={`container ${darkMode ? 'dark' : 'light'}`}>
       {/* Copy success popup */}
-      {copied && (
-        <div className="copy-popup">
-          ✅ Copied to clipboard!
-        </div>
-      )}
+      {copied && <div className="copy-popup">✅ Copied to clipboard!</div>}
 
       {/* Toolbar */}
       <div className="toolbar">
@@ -73,6 +90,9 @@ MIT License`;
           </button>
           <button onClick={handleCopy} className="btn btn-secondary">
             📋 Copy Markdown
+          </button>
+          <button onClick={downloadWord} className="btn btn-success">
+            ⬇️ Download as Word
           </button>
         </div>
 
